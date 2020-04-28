@@ -6,6 +6,7 @@ rodar com python3 node.py
 
 Obter o blockchain  
 GET:  http://localhost:5001/get_chain  
+Return
 {  
 	"chain":[	{	"index":1,  
 				"previous_hash":"0",  
@@ -21,9 +22,11 @@ GET:  http://localhost:5001/get_chain
 Inserir dados  
 POST:  
 http://localhost:5001/add_transaction  
+Payload
 {  
-	"user": "user_id",  
-	"data": {}  
+	"user": user_id,  
+	"public_key", public_key,  
+	"data": {...}  
 }  
 
 

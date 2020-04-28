@@ -66,8 +66,9 @@ class Blockchain:
             block_index += 1
         return True
     
-    def add_transaction(self, user, data):
+    def add_transaction(self, user, public_key, data):
         self.transactions.append({'user': user,
+				  'public_key': public_key, 
                                   'data': data})
         previous_block = self.get_previous_block()
         return previous_block['index'] + 1
@@ -104,6 +105,14 @@ node_address = str(uuid4()).replace('-', '')
 # Creating a Blockchain
 blockchain = Blockchain()
 
+# Home Blockchain
+@app.route('/', methods = ['GET'])
+def get_home():
+    response = {'Hello': 'HealthChain',
+                'Description': 'Your New Medical Information'}
+    return jsonify(response), 200
+
+
 # Mining a new block
 @app.route('/mine_block', methods = ['GET'])
 def mine_block():
@@ -111,7 +120,7 @@ def mine_block():
     previous_proof = previous_block['proof']
     proof = blockchain.proof_of_work(previous_proof)
     previous_hash = blockchain.hash(previous_block)
-    blockchain.add_transaction(user = node_address, data = 'teste')
+    blockchain.add_transaction(user = node_address, public_key = '',data = 'teste')
     block = blockchain.create_block(proof, previous_hash)
     response = {'message': 'Congratulations, you just mined a block!',
                 'index': block['index'],
@@ -142,10 +151,10 @@ def is_valid():
 @app.route('/add_transaction', methods = ['POST'])
 def add_transaction():
     json = request.get_json()
-    transaction_keys = ['user', 'data']
+    transaction_keys = ['user', 'public_key', 'data']
     if not all(key in json for key in transaction_keys):
         return 'Some elements of the transaction are missing', 400
-    index = blockchain.add_transaction(json['user'], json['data'])
+    index = blockchain.add_transaction(json['user'], json['public_key'], json['data'])
     response = {'message': f'This transaction will be added to Block {index}'}
     return jsonify(response), 201
 
