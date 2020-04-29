@@ -155,7 +155,8 @@ def add_transaction():
     if not all(key in json for key in transaction_keys):
         return 'Some elements of the transaction are missing', 400
     index = blockchain.add_transaction(json['user'], json['public_key'], json['data'])
-    response = {'message': f'This transaction will be added to Block {index}'}
+    response = {'index': index, 'message': f'This transaction will be added to Block {index}'}
+    #mine_block();
     return jsonify(response), 201
 
 # Part 3 - Decentralizing our Blockchain
