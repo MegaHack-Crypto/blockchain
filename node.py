@@ -94,6 +94,21 @@ class Blockchain:
             return True
         return False
 
+    def mine_block(self):
+        previous_block = self.get_previous_block()
+        previous_proof = previous_block['proof']
+        proof = self.proof_of_work(previous_proof)
+        previous_hash = self.hash(previous_block)
+        #self.add_transaction(user = node_address, public_key = '',data = 'teste')
+        block = self.create_block(proof, previous_hash)
+        response = {'message': 'Congratulations, you just mined a block!',
+	   	    'index': block['index'],
+		    'timestamp': block['timestamp'],
+		    'proof': block['proof'],
+		    'previous_hash': block['previous_hash'],
+		    'transactions': block['transactions']}
+        return response
+
 # Part 2 - Mining our Blockchain
 
 # Creating a Web App
@@ -155,8 +170,8 @@ def add_transaction():
     if not all(key in json for key in transaction_keys):
         return 'Some elements of the transaction are missing', 400
     index = blockchain.add_transaction(json['user'], json['public_key'], json['data'])
-    response = {'index': index, 'message': f'This transaction will be added to Block {index}'}
-    #mine_block();
+    #response = {'index': index, 'message': f'This transaction will be added to Block {index}'}
+    response = blockchain.mine_block();
     return jsonify(response), 201
 
 # Part 3 - Decentralizing our Blockchain
