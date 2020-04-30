@@ -152,6 +152,16 @@ def get_chain():
                 'length': len(blockchain.chain)}
     return jsonify(response), 200
 
+# Getting a specific block in the Blockchain
+@app.route('/get_block/<id>', methods = ['GET'])
+def get_block(id=0):
+    i=int(id)-1
+    if (i>0 and i<len(blockchain.chain)):
+        response = {'block': blockchain.chain[i] }
+    else:
+        return "No block", 400
+    return jsonify(response), 200
+
 # Checking if the Blockchain is valid
 @app.route('/is_valid', methods = ['GET'])
 def is_valid():
