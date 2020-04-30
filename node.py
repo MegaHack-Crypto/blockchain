@@ -21,6 +21,7 @@ class Blockchain:
         self.transactions = []
         self.create_block(proof = 1, previous_hash = '0')
         self.nodes = set()
+        self.load_chain()
     
     def create_block(self, proof, previous_hash):
         block = {'index': len(self.chain) + 1,
@@ -109,6 +110,17 @@ class Blockchain:
 		    'transactions': block['transactions']}
         return response
 
+    def save_chain(self):
+        with open('blockchain.json', 'w') as f:
+            json.dump(self.chain, f)
+
+    def load_chain(self):
+        try:
+            with open('blockchain.json', 'r') as f:
+                self.chain=json.load(f)
+        except Exception as e:
+            print('blockchain vazia')
+
 # Part 2 - Mining our Blockchain
 
 # Creating a Web App
@@ -182,6 +194,7 @@ def add_transaction():
     index = blockchain.add_transaction(json['user'], json['public_key'], json['data'])
     #response = {'index': index, 'message': f'This transaction will be added to Block {index}'}
     response = blockchain.mine_block();
+    blockchain.save_chain();
     return jsonify(response), 201
 
 # Part 3 - Decentralizing our Blockchain
