@@ -19,7 +19,7 @@ Return
 }  
 
 Obter um bloco especifico
-GET:  http://localhost:5001/get_block/<id>  
+GET:  http://localhost:5001/get_block/id  
 Return
 {  
     "block": {  
