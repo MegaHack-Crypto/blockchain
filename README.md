@@ -1,6 +1,11 @@
 # blockchain
 Desenvolvimento da blockchain
 
+
+instalar dependencias  
+pip3 install datetime Crypto flask requests uuid  
+
+
 rodar com python3 node.py  
 
 
