@@ -75,8 +75,10 @@ class Blockchain:
     def add_transaction(self, user, public_key, data):
 
         public_key_object = RSA.importKey(public_key)
+        data1 = json.dumps(data).encode("utf-8")
+        print(data1)
         random_phrase = ''
-        encrypted_message = public_key_object.encrypt(data.encode("utf-8"), random_phrase)
+        encrypted_message = public_key_object.encrypt(data1, random_phrase)
         data = base64.b64encode(encrypted_message[0]).decode("utf-8") 
         self.transactions.append({'user': user,
 				  'public_key': public_key, 
