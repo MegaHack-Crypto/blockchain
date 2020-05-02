@@ -7,10 +7,15 @@
 import datetime
 import hashlib
 import json
+import Crypto
 from flask import Flask, jsonify, request
 import requests
 from uuid import uuid4
 from urllib.parse import urlparse
+from Crypto.PublicKey import RSA
+from Crypto import Random
+import ast
+import base64
 
 # Part 1 - Building a Blockchain
 
@@ -68,6 +73,11 @@ class Blockchain:
         return True
     
     def add_transaction(self, user, public_key, data):
+
+        public_key_object = RSA.importKey(public_key)
+        random_phrase = ''
+        encrypted_message = public_key_object.encrypt(data.encode("utf-8"), random_phrase)
+        data = base64.b64encode(encrypted_message[0]).decode("utf-8") 
         self.transactions.append({'user': user,
 				  'public_key': public_key, 
                                   'data': data})
