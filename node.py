@@ -16,6 +16,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 import ast
 import base64
+import zlib
 
 # Part 1 - Building a Blockchain
 
@@ -73,19 +74,23 @@ class Blockchain:
         return True
     
     def add_transaction(self, user, public_key, data):
-
-        public_key_object = RSA.importKey(public_key)
-        data1 = json.dumps(data).encode("utf-8")
-        print(data1)
-        random_phrase = ''
-        encrypted_message = public_key_object.encrypt(data1, random_phrase)
-        data = base64.b64encode(encrypted_message[0]).decode("utf-8") 
+	
+        data = self.encrypt(public_key, data)
         self.transactions.append({'user': user,
 				  'public_key': public_key, 
                                   'data': data})
         previous_block = self.get_previous_block()
         return previous_block['index'] + 1
     
+    def encrypt(self, public_key, data):
+        public_key_object = RSA.importKey(public_key)
+        data1 = json.dumps(data).encode("utf-8")
+        blob = zlib.compress(data1)
+        random_phrase = ''
+        encrypted_message = public_key_object.encrypt(blob, random_phrase)
+        data = base64.b64encode(encrypted_message[0]).decode("utf-8") 
+        return data
+
     def add_node(self, address):
         parsed_url = urlparse(address)
         self.nodes.add(parsed_url.netloc)
