@@ -74,11 +74,9 @@ class Blockchain:
             block_index += 1
         return True
     
-    def add_transaction(self, user, public_key, data):
+    def add_transaction(self, user, data):
 	
-        data = self.encrypt(public_key, data)
         self.transactions.append({'user': user,
-				  'public_key': public_key, 
                                   'data': data})
         previous_block = self.get_previous_block()
         return previous_block['index'] + 1
@@ -129,7 +127,6 @@ class Blockchain:
         previous_proof = previous_block['proof']
         proof = self.proof_of_work(previous_proof)
         previous_hash = self.hash(previous_block)
-        #self.add_transaction(user = node_address, public_key = '',data = 'teste')
         block = self.create_block(proof, previous_hash)
         response = {'message': 'Congratulations, you just mined a block!',
 	   	    'index': block['index'],
@@ -168,24 +165,6 @@ def get_home():
                 'Description': 'Your New Medical Information'}
     return jsonify(response), 200
 
-
-# Mining a new block
-@app.route('/mine_block', methods = ['GET'])
-def mine_block():
-    previous_block = blockchain.get_previous_block()
-    previous_proof = previous_block['proof']
-    proof = blockchain.proof_of_work(previous_proof)
-    previous_hash = blockchain.hash(previous_block)
-    blockchain.add_transaction(user = node_address, public_key = '',data = 'teste')
-    block = blockchain.create_block(proof, previous_hash)
-    response = {'message': 'Congratulations, you just mined a block!',
-                'index': block['index'],
-                'timestamp': block['timestamp'],
-                'proof': block['proof'],
-                'previous_hash': block['previous_hash'],
-                'transactions': block['transactions']}
-    return jsonify(response), 200
-
 # Getting the full Blockchain
 @app.route('/get_chain', methods = ['GET'])
 def get_chain():
@@ -217,11 +196,10 @@ def is_valid():
 @app.route('/add_transaction', methods = ['POST'])
 def add_transaction():
     json = request.get_json()
-    transaction_keys = ['user', 'public_key', 'data']
+    transaction_keys = ['user', 'data']
     if not all(key in json for key in transaction_keys):
         return 'Some elements of the transaction are missing', 400
-    index = blockchain.add_transaction(json['user'], json['public_key'], json['data'])
-    #response = {'index': index, 'message': f'This transaction will be added to Block {index}'}
+    index = blockchain.add_transaction(json['user'], json['data'])
     response = blockchain.mine_block();
     blockchain.save_chain();
     return jsonify(response), 201
