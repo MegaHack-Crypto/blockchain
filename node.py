@@ -13,6 +13,7 @@ import requests
 from uuid import uuid4
 from urllib.parse import urlparse
 from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 from Crypto import Random
 import ast
 import base64
@@ -84,12 +85,23 @@ class Blockchain:
     
     def encrypt(self, public_key, data):
         public_key_object = RSA.importKey(public_key)
+        #public_key_object = PKCS1_OAEP.new(public_key_object)
         data1 = json.dumps(data).encode("utf-8")
         blob = zlib.compress(data1)
         random_phrase = ''
         encrypted_message = public_key_object.encrypt(blob, random_phrase)
+        #encrypted_message = public_key_object.encrypt(blob)
         data = base64.b64encode(encrypted_message[0]).decode("utf-8") 
+        self.decrypt(data)
         return data
+
+    def decrypt(self, data):
+        private_key="-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAtfcgF6x3nXY4IMPS9BN8UDSUoL8J5uoKXl1xjogGigsOdNb8\nsjx1ump4SHyH8msYSiE7SEwI42wxCqZCMD4yZm92VFYA8zgY0xQobRGtkAzNG82q\nbVGSK73kh3cQMGcnwzOQFC7S2JGYMwdZIwsNjx4NEQnFaqbDB9xWss4GLYWVsVpv\nwLYzttV56H9UumteSSpdrYdTq9WHmeHypG2z2+bNXUGxJtjxtwctzVbljT0tzWTo\nPl1RF9CmOpPhSn4lKG0DG+dnXv97mat+Kdn5kyqPFXvU9bzXBGsZR0+jGaEQA4Sw\nQNWwokdWOTrHMbh7KRZ99cIRrspXXETMH/0lPwIDAQABAoIBAGKQYM7R+dzOC2sc\nB2l0IJMlWBiWQlvVDBa/UOJepgQiJwt85FX7T93RDCRfaBgUkIye4YiwvuPJV+sn\n0ZRmLFC2MYdPKqaUDUZQlfE2cSgk9vkHdzhNxfpxmpcSFC/TwIMIrBNypXzvqFyD\nr3G+6/JI2dUP0OKLP/tDC6dA17HRzSfcD5MOQqJhk2wQc9R8m3q+8u1trii4vkTq\nf9/Di/mBuSxMIQjXRBZomrAURVEoX18D0Y6x2sMYfMgowv+hCPVClYgpSQtR/t8k\n9BP9SOa5ssPch4A+XOGzUuUsH6gnPtckr+l59wjnSyZqc7RNS0qi79YN8tfEz+z3\nnttBoSECgYEA9v4zsOs7Y0IfQVlDkJ3vwDQJ/wkyD2Gc6wy9i9r/deubAkd7zcaL\nFikfBvBH3IvnJi+s1V+qoEshkaWU+/btrtmU+NquIO+Kjt49tXb5qoT/dvjyqpcQ\nOnXMF13OeQeWp9FO7TJC56IWjBgg6T5ORQ5KyIwJnm9FDAbhTfstRQ8CgYEAvJnb\n8eeadeANkyyaY3ascH0zBVqeyJEpPJrsy52gCCXdc/EFaznhFmjT4wq6sbUQBFi0\nMnAiz6/HTfsMaoqFznsCoBMuB+3fn9BHSZyEnaGnK9SvkGCxyAF6C1zfnxTwu/Y2\nx0KRqA9IJaql9p+AkeDbbR43zFzAUoZk1AEj/NECgYB3OX+UMAhrwlg6AC+4GDTJ\nz5Tfsf2jJRhM8cpxPxY/QqqBcCYXz3YGDXV3sPbPRA0hBrRkDxja5Ulf99Cxy6Ex\n3L+nXE/fgCGfEzIwbSzZHff+4u6oX+EqhwAsa1CmZX5YpZV2s+NN0pUVrPP+AuBf\nPyXkJoziGI343z1UmiFhCwKBgF6uizmtQODuY0JAgR1v5W/vmp6UeORN47rWOAyc\njEuq3rsnA8Zp3zNF2yG/MCyormrQMV6k5wUGxPLEFt6hvj0DijTcjB5U8BAmGrO8\nzOLp1afudVjxAi9bdm6f6G/Prm9eUu/D3qXVTi4CtqDSQFR74wyrv+1rnu2PJK0+\nCVgRAoGBAMtkd8LnZjLOZRCQi7mnIOOtdJy8kvuOeL1Kuwd9+BWWu1UD6428doVB\nTbCJIZOQ023pFMuG9RKq6sbIg5DHwqCBABrWKLZObu70gxK6I+5n69vsyvlP84r1\n5ClDIdvStC6IpDMi22hePfCoEPKUNWM4e9vaez4sZNzvxGj5TzVa\n-----END RSA PRIVATE KEY-----"
+        encrypted_message = base64.b64decode(data)
+        private_key_object = RSA.importKey(private_key)
+        decrypted_message = private_key_object.decrypt(encrypted_message)
+        data = zlib.decompress(decrypted_message).decode("utf-8")
+        print(data)
 
     def add_node(self, address):
         parsed_url = urlparse(address)
